@@ -1,0 +1,44 @@
+-- first terminal
+
+BEGIN TRANSACTION;
+SELECT * from account;
+COMMIT;
+
+
+-- second terminal
+
+BEGIN TRANSACTION;
+
+set transaction isolation level repeatable read;
+
+UPDATE account
+	SET username = 'ajones'
+	WHERE fullname = 'Alice Jones';
+
+COMMIT;
+
+--The both terminals show the same result, as dirty read is not possible
+
+-- first terminal
+
+BEGIN TRANSACTION;
+
+UPDATE account
+	SET balance = balance + 10
+	WHERE fullname = 'Alice Jones';
+
+COMMIT;
+
+-- second terminal
+
+BEGIN TRANSACTION;
+
+set transaction isolation level repeatable read;
+
+UPDATE account
+	SET balance = balance + 20
+	WHERE fullname = 'Alice Jones';
+
+COMMIT;
+
+--The both terminals show the same result, as dirty read is not possible
